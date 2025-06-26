@@ -4,6 +4,9 @@ body {
   font-family: "Arial", sans-serif;
   background: #fff;
   color: #333;
+  /* width:100%; */
+  display: flex;
+  justify-content: center;
 }
 
 .app {
@@ -12,7 +15,8 @@ body {
   padding: 20px;
 }
 
-h1, h2 {
+h1,
+h2 {
   color: #e60000;
 }
 
@@ -26,6 +30,7 @@ input[type="password"] {
   border-radius: 8px;
   text-align: center;
   font-weight: bold;
+  border-radius: 8px;
 }
 
 button {
@@ -163,5 +168,13 @@ footer span {
   input[type="text"],
   input[type="password"] {
     width: 100%;
+    border-radius: 8px;
   }
+}
+#email {
+  border-radius: 5px;
+  width: 300px;
+  padding: 10px;
+  border:solid 1px red;
+  text-align: center;
 }
