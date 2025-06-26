@@ -7,10 +7,17 @@ import Footer from "./Footer";
 export default function MainPage({ topicsData }) {
   const [searchQuery, setSearchQuery] = useState("");
 
+  // ⛑️ Validate topicsData
+  if (!Array.isArray(topicsData)) {
+    console.warn("⚠️ topicsData is not available yet:", topicsData);
+    return <div>Loading topics...</div>;
+  }
+
+  const trimmedQuery = searchQuery.trim().toLowerCase();
+
   const foundTopic = topicsData.find(
     (topic) =>
-      topic.Keywords &&
-      topic.Keywords.toLowerCase().includes(searchQuery.toLowerCase())
+      topic.Keywords && topic.Keywords.toLowerCase().includes(trimmedQuery)
   );
 
   return (
@@ -23,10 +30,11 @@ export default function MainPage({ topicsData }) {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
+
       <div id="topicTitle" className="section-title">
         {foundTopic
           ? foundTopic.Title
-          : searchQuery
+          : trimmedQuery
           ? "No matching topic found"
           : "Title"}
       </div>

@@ -1,39 +1,59 @@
-import { useState, useEffect } from "react";
-import { fetchTopics } from "./utils/api";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./components/LoginPage";
+import FinishSignIn from "./components/FinishSignIn";
 import MainPage from "./components/MainPage";
-import "./styles/App.css";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { useEffect, useState } from "react";
+import { fetchTopics } from "./utils/api"; // adjust if needed
 
-export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [topicsData, setTopicsData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+function AppRoutes() {
+  const { user } = useAuth();
+  const [topicsData, setTopicsData] = useState(null);
+  const [loadingTopics, setLoadingTopics] = useState(true);
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const data = await fetchTopics();
-        setTopicsData(data);
-        setLoading(false);
-      } catch (err) {
-        setError(err);
-        setLoading(false);
-      }
+    if (user) {
+      fetchTopics()
+        .then((data) => {
+          console.log("✅ Topics loaded:", data);
+          setTopicsData(data);
+        })
+        .catch((err) => {
+          console.error("❌ Error loading topics:", err);
+        })
+        .finally(() => {
+          setLoadingTopics(false);
+        });
     }
-    loadData();
-  }, []);
+  }, [user]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error loading data. Please try again later.</div>;
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/finishSignIn" element={<FinishSignIn />} />
+      </Routes>
+    );
+  }
+
+  if (loadingTopics) {
+    return <div>⏳ Loading topics...</div>;
+  }
 
   return (
-    <div className="app">
-      {isLoggedIn ? (
-        <MainPage topicsData={topicsData} />
-      ) : (
-        <LoginPage onLogin={() => setIsLoggedIn(true)} />
-      )}
-    </div>
+    <Routes>
+      <Route path="/" element={<MainPage topicsData={topicsData} />} />
+      <Route path="/finishSignIn" element={<FinishSignIn />} />
+    </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </AuthProvider>
   );
 }
